@@ -57,6 +57,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         keyboardMonitor.delegate = self
         keyboardMonitor.start()
+
+        UpdateChecker.checkInBackground()
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
@@ -110,6 +112,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         launchItem.state = LaunchAtLogin.isEnabled ? .on : .off
         menu.addItem(launchItem)
 
+        let updateItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
+        updateItem.target = self
+        menu.addItem(updateItem)
+
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -125,6 +131,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func toggleLaunchAtLogin() {
         LaunchAtLogin.toggle()
+    }
+
+    @objc private func checkForUpdates() {
+        UpdateChecker.checkNow()
     }
 
     private func switchLayoutForCurrentState() {

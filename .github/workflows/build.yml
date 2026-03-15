@@ -36,7 +36,10 @@ jobs:
 
       - name: Create DMG
         run: |
-          hdiutil create -volname kbswitch -srcfolder .build/kbswitch.app \
+          mkdir -p .build/dmg
+          cp -a .build/kbswitch.app .build/dmg/
+          ln -s /Applications .build/dmg/Applications
+          hdiutil create -volname kbswitch -srcfolder .build/dmg \
             -ov -format UDZO .build/kbswitch.dmg
 
       - name: Create GitHub Release

@@ -78,6 +78,7 @@ Sources/kbswitch/
     InputSourceManager.swift Carbon TIS input source control
     KeyboardIdentifier.swift Vendor/product/serial identifier
     MappingStore.swift       UserDefaults persistence
+    UpdateChecker.swift      GitHub release update checker
     LaunchAtLogin.swift      SMAppService login item toggle
     Info.plist               App bundle metadata
 ```
