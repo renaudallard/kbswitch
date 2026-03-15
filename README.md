@@ -28,9 +28,16 @@ Download `kbswitch.dmg` from the
 [latest release](https://github.com/renaudallard/kbswitch/releases/latest), open it,
 and drag `kbswitch.app` to `/Applications`.
 
-> **Note:** On first launch, macOS will prompt for **Input Monitoring**
-> permission (System Settings > Privacy & Security > Input Monitoring). This is
-> required to detect keyboard connections.
+> **Gatekeeper warning:** The app is not notarized by Apple. On first open,
+> macOS will show a warning that the app is from an unidentified developer.
+> To allow it, go to **System Settings > Privacy & Security**, scroll down,
+> and click **Open Anyway** next to the kbswitch message. Alternatively, you
+> can right-click the app and select **Open**, then confirm in the dialog.
+> You only need to do this once.
+
+> **Input Monitoring:** On first launch, macOS will prompt for **Input
+> Monitoring** permission (System Settings > Privacy & Security > Input
+> Monitoring). This is required to detect keyboard connections.
 
 ## Build from source
 
