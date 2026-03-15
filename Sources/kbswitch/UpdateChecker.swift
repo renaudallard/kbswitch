@@ -38,6 +38,9 @@ enum UpdateChecker {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     }
 
+    private static var progressObservation: NSKeyValueObservation?
+    private static var progressWindow: NSPanel?
+
     static func checkInBackground() {
         guard currentVersion != nil else { return }
         fetchLatestRelease { release in
@@ -117,36 +120,111 @@ enum UpdateChecker {
         return false
     }
 
+    // MARK: - Progress window
+
+    private static func showProgressWindow() -> (panel: NSPanel, bar: NSProgressIndicator, label: NSTextField) {
+        let panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 340, height: 80),
+            styleMask: [.titled],
+            backing: .buffered,
+            defer: false
+        )
+        panel.title = "Updating kbswitch"
+        panel.isFloatingPanel = true
+        panel.center()
+
+        let label = NSTextField(labelWithString: "Downloading update...")
+        label.frame = NSRect(x: 20, y: 44, width: 300, height: 17)
+        label.font = .systemFont(ofSize: 13)
+
+        let bar = NSProgressIndicator(frame: NSRect(x: 20, y: 16, width: 300, height: 20))
+        bar.style = .bar
+        bar.minValue = 0
+        bar.maxValue = 100
+        bar.doubleValue = 0
+        bar.isIndeterminate = false
+
+        panel.contentView?.addSubview(label)
+        panel.contentView?.addSubview(bar)
+
+        progressWindow = panel
+        panel.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+
+        return (panel, bar, label)
+    }
+
+    private static func closeProgressWindow() {
+        progressWindow?.close()
+        progressWindow = nil
+        progressObservation = nil
+    }
+
     // MARK: - Install
 
     private static func downloadAndInstall(release: Release) {
         guard let url = URL(string: release.dmgURL) else { return }
 
-        URLSession.shared.downloadTask(with: url) { tempURL, _, error in
+        let (panel, bar, label) = showProgressWindow()
+
+        let task = URLSession.shared.downloadTask(with: url) { tempURL, _, error in
             DispatchQueue.main.async {
+                progressObservation = nil
+
                 guard let tempURL = tempURL else {
+                    closeProgressWindow()
                     showErrorAlert("Download failed: \(error?.localizedDescription ?? "unknown error")")
                     return
                 }
 
                 let dmgPath = NSTemporaryDirectory() + "kbswitch-update.dmg"
-                let fm = FileManager.default
-                try? fm.removeItem(atPath: dmgPath)
+                try? FileManager.default.removeItem(atPath: dmgPath)
 
-                do {
-                    try fm.moveItem(at: tempURL, to: URL(fileURLWithPath: dmgPath))
-                } catch {
+                guard let _ = try? FileManager.default.moveItem(
+                    at: tempURL, to: URL(fileURLWithPath: dmgPath)
+                ) else {
+                    closeProgressWindow()
                     showErrorAlert("Failed to save update.")
                     return
                 }
 
-                installFromDMG(path: dmgPath)
+                label.stringValue = "Installing update..."
+                bar.isIndeterminate = true
+                bar.startAnimation(nil)
+
+                let appPath = Bundle.main.bundlePath
+
+                DispatchQueue.global().async {
+                    let error = performInstall(dmgPath: dmgPath, appPath: appPath)
+                    DispatchQueue.main.async {
+                        if let error = error {
+                            closeProgressWindow()
+                            showErrorAlert(error)
+                        } else {
+                            bar.stopAnimation(nil)
+                            bar.isIndeterminate = false
+                            bar.doubleValue = 100
+                            label.stringValue = "Update complete. Restarting..."
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                closeProgressWindow()
+                                relaunch(appPath: appPath)
+                            }
+                        }
+                    }
+                }
             }
-        }.resume()
+        }
+
+        progressObservation = task.progress.observe(\.fractionCompleted) { progress, _ in
+            DispatchQueue.main.async {
+                bar.doubleValue = progress.fractionCompleted * 100
+            }
+        }
+
+        task.resume()
     }
 
-    private static func installFromDMG(path dmgPath: String) {
-        let appPath = Bundle.main.bundlePath
+    private static func performInstall(dmgPath: String, appPath: String) -> String? {
         let fm = FileManager.default
         let mountPoint = NSTemporaryDirectory() + "kbswitch-mount"
 
@@ -154,16 +232,14 @@ enum UpdateChecker {
         try? fm.createDirectory(atPath: mountPoint, withIntermediateDirectories: true)
 
         guard run("/usr/bin/hdiutil", "attach", dmgPath, "-nobrowse", "-quiet", "-mountpoint", mountPoint) else {
-            showErrorAlert("Failed to mount update image.")
-            return
+            return "Failed to mount update image."
         }
 
         let newAppPath = mountPoint + "/kbswitch.app"
 
         guard fm.fileExists(atPath: newAppPath) else {
             detach(mountPoint)
-            showErrorAlert("Update image does not contain kbswitch.app.")
-            return
+            return "Update image does not contain kbswitch.app."
         }
 
         let stagedPath = NSTemporaryDirectory() + "kbswitch-staged.app"
@@ -173,8 +249,7 @@ enum UpdateChecker {
             try fm.copyItem(atPath: newAppPath, toPath: stagedPath)
         } catch {
             detach(mountPoint)
-            showErrorAlert("Failed to stage update.")
-            return
+            return "Failed to stage update."
         }
 
         detach(mountPoint)
@@ -188,11 +263,10 @@ enum UpdateChecker {
             try? fm.removeItem(atPath: backupPath)
             _ = run("/usr/bin/xattr", "-dr", "com.apple.quarantine", appPath)
         } catch {
-            showErrorAlert("Failed to install update: \(error.localizedDescription)")
-            return
+            return "Failed to install update: \(error.localizedDescription)"
         }
 
-        relaunch(appPath: appPath)
+        return nil
     }
 
     private static func relaunch(appPath: String) {
