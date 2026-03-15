@@ -32,26 +32,12 @@ struct InputSource: Identifiable {
 }
 
 enum InputSourceManager {
+    private static var sourceMap: [String: TISInputSource] = [:]
+
     static func availableSources() -> [InputSource] {
-        let conditions: [String: Any] = [
-            kTISPropertyInputSourceCategory as String: kTISCategoryKeyboardInputSource!,
-            kTISPropertyInputSourceIsSelectCapable as String: true,
-        ]
-
-        guard let list = TISCreateInputSourceList(conditions as CFDictionary, false)?
-            .takeRetainedValue() as? [TISInputSource] else {
-            return []
-        }
-
-        return list.compactMap { source in
-            guard let idPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
-                  let namePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName) else {
-                return nil
-            }
-            let id = Unmanaged<CFString>.fromOpaque(idPtr).takeUnretainedValue() as String
-            let name = Unmanaged<CFString>.fromOpaque(namePtr).takeUnretainedValue() as String
-            return InputSource(id: id, name: name)
-        }
+        let (sources, map) = buildSourceList()
+        sourceMap = map
+        return sources
     }
 
     static func currentSourceID() -> String? {
@@ -65,19 +51,46 @@ enum InputSourceManager {
     static func select(sourceID: String) {
         if currentSourceID() == sourceID { return }
 
-        let conditions: [String: Any] = [
-            kTISPropertyInputSourceID as String: sourceID,
-        ]
-
-        guard let list = TISCreateInputSourceList(conditions as CFDictionary, false)?
-            .takeRetainedValue() as? [TISInputSource],
-            let source = list.first else {
-            return
+        if let source = sourceMap[sourceID] {
+            let status = TISSelectInputSource(source)
+            if status == noErr { return }
         }
 
+        let (_, map) = buildSourceList()
+        sourceMap = map
+
+        guard let source = map[sourceID] else { return }
         let status = TISSelectInputSource(source)
         if status != noErr {
             NSLog("kbswitch: TISSelectInputSource failed with status %d for %@", status, sourceID)
         }
+    }
+
+    private static func buildSourceList() -> ([InputSource], [String: TISInputSource]) {
+        let conditions: [String: Any] = [
+            kTISPropertyInputSourceCategory as String: kTISCategoryKeyboardInputSource!,
+            kTISPropertyInputSourceIsSelectCapable as String: true,
+        ]
+
+        guard let list = TISCreateInputSourceList(conditions as CFDictionary, false)?
+            .takeRetainedValue() as? [TISInputSource] else {
+            return ([], [:])
+        }
+
+        var sources: [InputSource] = []
+        var map: [String: TISInputSource] = [:]
+
+        for source in list {
+            guard let idPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
+                  let namePtr = TISGetInputSourceProperty(source, kTISPropertyLocalizedName) else {
+                continue
+            }
+            let id = Unmanaged<CFString>.fromOpaque(idPtr).takeUnretainedValue() as String
+            let name = Unmanaged<CFString>.fromOpaque(namePtr).takeUnretainedValue() as String
+            sources.append(InputSource(id: id, name: name))
+            map[id] = source
+        }
+
+        return (sources, map)
     }
 }

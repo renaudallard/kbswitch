@@ -28,9 +28,10 @@ import Foundation
 final class MappingStore {
     private let key = "keyboardMappings"
     private let defaults = UserDefaults.standard
+    private var cache: [String: String]?
 
     func layoutID(for keyboard: KeyboardIdentifier) -> String? {
-        let map = mappings()
+        let map = cachedMappings()
         if let value = map[keyboard.persistenceKey] {
             return value
         }
@@ -41,12 +42,16 @@ final class MappingStore {
     }
 
     func setLayoutID(_ layoutID: String?, for keyboard: KeyboardIdentifier) {
-        var map = mappings()
+        var map = cachedMappings()
         map[keyboard.persistenceKey] = layoutID
         defaults.set(map, forKey: key)
+        cache = map
     }
 
-    private func mappings() -> [String: String] {
-        defaults.dictionary(forKey: key) as? [String: String] ?? [:]
+    private func cachedMappings() -> [String: String] {
+        if let cache = cache { return cache }
+        let map = defaults.dictionary(forKey: key) as? [String: String] ?? [:]
+        cache = map
+        return map
     }
 }
