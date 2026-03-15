@@ -286,7 +286,20 @@ enum UpdateChecker {
         return nil
     }
 
+    static func showPostUpdateAlertIfNeeded() {
+        let key = "updateJustCompleted"
+        guard UserDefaults.standard.bool(forKey: key) else { return }
+        UserDefaults.standard.removeObject(forKey: key)
+        let alert = NSAlert()
+        alert.messageText = "Update Complete"
+        alert.informativeText = "kbswitch has been updated to version \(currentVersion ?? "?")."
+        alert.addButton(withTitle: "OK")
+        alert.alertStyle = .informational
+        alert.runModal()
+    }
+
     private static func relaunch(appPath: String) {
+        UserDefaults.standard.set(true, forKey: "updateJustCompleted")
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/bin/sh")
         task.arguments = ["-c", "sleep 1 && open \"$1\"", "--", appPath]

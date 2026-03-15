@@ -60,6 +60,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         keyboardMonitor.delegate = self
         keyboardMonitor.start()
 
+        UpdateChecker.showPostUpdateAlertIfNeeded()
         UpdateChecker.checkInBackground()
     }
 
