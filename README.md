@@ -66,6 +66,9 @@ swift build -c release --arch arm64
 
 Toggle **Launch at Login** in the menu to start kbswitch automatically.
 
+The app checks for updates on launch and can install them directly from
+GitHub. Use **Check for Updates...** in the menu to check manually.
+
 ## How it works
 
 | Component | Details |
@@ -73,6 +76,7 @@ Toggle **Launch at Login** in the menu to start kbswitch automatically.
 | **Keyboard detection** | IOKit HID Manager monitors connect/disconnect events in real time. Each keyboard is identified by vendor ID, product ID, and serial number. |
 | **Layout switching** | Carbon Text Input Source Services (`TISSelectInputSource`) changes the active input source. |
 | **Configuration** | Keyboard-to-layout mappings are stored in UserDefaults. |
+| **Auto-update** | Checks GitHub releases on launch. Downloads the DMG, replaces the app, and relaunches automatically. |
 | **No dock icon** | Runs as an `LSUIElement` agent app. |
 
 ## Project structure
