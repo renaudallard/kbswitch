@@ -10,16 +10,19 @@ on:
 jobs:
   build:
     runs-on: macos-26
+    strategy:
+      matrix:
+        arch: [arm64, x86_64]
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build app bundle
-        run: bash build-app.sh
+      - name: Build app bundle (${{ matrix.arch }})
+        run: bash build-app.sh ${{ matrix.arch }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: kbswitch.app
+          name: kbswitch-${{ matrix.arch }}.app
           path: .build/kbswitch.app
 
   release:
@@ -31,18 +34,27 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build app bundle
-        run: bash build-app.sh
-
-      - name: Create DMG
+      - name: Build arm64
         run: |
-          mkdir -p .build/dmg
-          cp -a .build/kbswitch.app .build/dmg/
-          ln -s /Applications .build/dmg/Applications
-          hdiutil create -volname kbswitch -srcfolder .build/dmg \
-            -ov -format UDZO .build/kbswitch.dmg
+          bash build-app.sh arm64
+          mkdir -p .build/dmg-arm64
+          cp -a .build/kbswitch.app .build/dmg-arm64/
+          ln -s /Applications .build/dmg-arm64/Applications
+          hdiutil create -volname kbswitch -srcfolder .build/dmg-arm64 \
+            -ov -format UDZO .build/kbswitch-arm64.dmg
+
+      - name: Build x86_64
+        run: |
+          bash build-app.sh x86_64
+          mkdir -p .build/dmg-x86_64
+          cp -a .build/kbswitch.app .build/dmg-x86_64/
+          ln -s /Applications .build/dmg-x86_64/Applications
+          hdiutil create -volname kbswitch -srcfolder .build/dmg-x86_64 \
+            -ov -format UDZO .build/kbswitch-x86_64.dmg
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: .build/kbswitch.dmg
+          files: |
+            .build/kbswitch-arm64.dmg
+            .build/kbswitch-x86_64.dmg

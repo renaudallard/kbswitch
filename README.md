@@ -15,7 +15,7 @@
 <p align="center">
   <a href="https://github.com/renaudallard/kbswitch/releases/latest"><img src="https://img.shields.io/github/v/release/renaudallard/kbswitch?label=download&style=flat-square" alt="Latest release"></a>
   <img src="https://img.shields.io/badge/macOS-13.0%2B-blue?style=flat-square" alt="macOS 13.0+">
-  <img src="https://img.shields.io/badge/arch-Apple%20Silicon-orange?style=flat-square" alt="Apple Silicon">
+  <img src="https://img.shields.io/badge/arch-arm64%20%7C%20x86__64-orange?style=flat-square" alt="arm64 | x86_64">
   <img src="https://img.shields.io/github/license/renaudallard/kbswitch?style=flat-square" alt="License">
 </p>
 
@@ -31,9 +31,13 @@
 
 ## Install
 
-Download **kbswitch.dmg** from the
-[latest release](https://github.com/renaudallard/kbswitch/releases/latest),
-open it, and drag **kbswitch.app** to `/Applications`.
+Download the DMG for your architecture from the
+[latest release](https://github.com/renaudallard/kbswitch/releases/latest):
+
+- **kbswitch-arm64.dmg** for Apple Silicon (M1/M2/M3/M4)
+- **kbswitch-x86_64.dmg** for Intel
+
+Open it and drag **kbswitch.app** to `/Applications`.
 
 > [!WARNING]
 > **Gatekeeper:** The app is not notarized by Apple. On first open, macOS will
@@ -61,7 +65,8 @@ Use **Check for Updates...** to check for and install new versions.
 ## Build from source
 
 ```sh
-bash build-app.sh          # app bundle at .build/kbswitch.app
+bash build-app.sh              # arm64 app bundle (default)
+bash build-app.sh x86_64       # x86_64 app bundle
 swift build -c release --arch arm64   # binary only
 ```
 

@@ -3,10 +3,11 @@ set -e
 
 APP_NAME="kbswitch"
 BUILD_DIR=".build"
+ARCH="${1:-arm64}"
 APP_BUNDLE="${BUILD_DIR}/${APP_NAME}.app"
 
-BIN_PATH=$(swift build -c release --arch arm64 --show-bin-path)
-swift build -c release --arch arm64
+BIN_PATH=$(swift build -c release --arch "${ARCH}" --show-bin-path)
+swift build -c release --arch "${ARCH}"
 
 rm -rf "${APP_BUNDLE}"
 mkdir -p "${APP_BUNDLE}/Contents/MacOS"
@@ -29,4 +30,4 @@ rm -rf "${ICONSET}"
 
 codesign --force --sign - "${APP_BUNDLE}"
 
-echo "Built: ${APP_BUNDLE}"
+echo "Built: ${APP_BUNDLE} (${ARCH})"
