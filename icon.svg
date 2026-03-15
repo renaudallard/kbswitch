@@ -74,7 +74,7 @@
   <rect x="816" y="636" width="44" height="38" rx="6" fill="#48484a"/>
 
   <!-- Big S striking through the keyboard, centered -->
-  <text x="512" y="560" font-family="Helvetica, Arial, sans-serif" font-weight="bold"
-        font-size="820" fill="#0a84ff" text-anchor="middle" dominant-baseline="central"
+  <text x="512" y="540" font-family="Helvetica, Arial, sans-serif" font-weight="bold"
+        font-size="620" fill="#0a84ff" text-anchor="middle" dominant-baseline="central"
         font-style="italic">S</text>
 </svg>
