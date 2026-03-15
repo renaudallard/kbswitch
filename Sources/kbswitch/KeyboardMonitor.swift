@@ -54,8 +54,8 @@ final class KeyboardMonitor {
 
         let matching: [[String: Any]] = [
             [
-                kIOHIDDeviceUsagePageKey as String: kHIDPage_GenericDesktop,
-                kIOHIDDeviceUsageKey as String: kHIDUsage_GD_Keyboard,
+                kIOHIDPrimaryUsagePageKey as String: kHIDPage_GenericDesktop,
+                kIOHIDPrimaryUsageKey as String: kHIDUsage_GD_Keyboard,
             ],
         ]
         IOHIDManagerSetDeviceMatchingMultiple(manager, matching as CFArray)
