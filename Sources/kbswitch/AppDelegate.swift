@@ -120,6 +120,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         launchItem.state = LaunchAtLogin.isEnabled ? .on : .off
         menu.addItem(launchItem)
 
+        let keyboardSettings = NSMenuItem(title: "Keyboard Settings...", action: #selector(openKeyboardSettings), keyEquivalent: "")
+        keyboardSettings.target = self
+        menu.addItem(keyboardSettings)
+
         let updateItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
         updateItem.target = self
         menu.addItem(updateItem)
@@ -139,6 +143,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func toggleLaunchAtLogin() {
         LaunchAtLogin.toggle()
+    }
+
+    @objc private func openKeyboardSettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension")!)
     }
 
     @objc private func checkForUpdates() {
