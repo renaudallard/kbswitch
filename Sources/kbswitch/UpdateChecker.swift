@@ -47,9 +47,11 @@ enum UpdateChecker {
     static func startDailyCheck() {
         guard currentVersion != nil else { return }
         checkIfDue()
-        checkTimer = Timer.scheduledTimer(withTimeInterval: 86400, repeats: true) { _ in
+        let timer = Timer.scheduledTimer(withTimeInterval: 86400, repeats: true) { _ in
             checkIfDue()
         }
+        timer.tolerance = 3600
+        checkTimer = timer
     }
 
     private static func checkIfDue() {
