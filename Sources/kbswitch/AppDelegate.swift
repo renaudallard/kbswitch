@@ -79,33 +79,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 if keyboard.isBuiltIn {
                     title += " (built-in)"
                 }
-                if #available(macOS 14, *) {
-                    menu.addItem(.sectionHeader(title: title))
-                } else {
-                    let kbItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
-                    kbItem.isEnabled = false
-                    menu.addItem(kbItem)
-                }
 
                 let selectedLayout = mappingStore.layoutID(for: keyboard.identifier)
+
+                let submenu = NSMenu()
 
                 let noneItem = NSMenuItem(title: "None", action: #selector(selectLayout(_:)), keyEquivalent: "")
                 noneItem.target = self
                 noneItem.representedObject = LayoutSelection(keyboard: keyboard.identifier, layoutID: nil)
                 noneItem.state = selectedLayout == nil ? .on : .off
-                noneItem.indentationLevel = 1
-                menu.addItem(noneItem)
+                submenu.addItem(noneItem)
+
+                submenu.addItem(NSMenuItem.separator())
 
                 for source in sources {
                     let item = NSMenuItem(title: source.name, action: #selector(selectLayout(_:)), keyEquivalent: "")
                     item.target = self
                     item.representedObject = LayoutSelection(keyboard: keyboard.identifier, layoutID: source.id)
                     item.state = selectedLayout == source.id ? .on : .off
-                    item.indentationLevel = 1
-                    menu.addItem(item)
+                    submenu.addItem(item)
                 }
 
-                menu.addItem(NSMenuItem.separator())
+                let kbItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+                kbItem.submenu = submenu
+                menu.addItem(kbItem)
             }
         }
 
