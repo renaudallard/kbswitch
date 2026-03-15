@@ -186,6 +186,7 @@ enum UpdateChecker {
             try fm.moveItem(atPath: appPath, toPath: backupPath)
             try fm.moveItem(atPath: stagedPath, toPath: appPath)
             try? fm.removeItem(atPath: backupPath)
+            _ = run("/usr/bin/xattr", "-dr", "com.apple.quarantine", appPath)
         } catch {
             showErrorAlert("Failed to install update: \(error.localizedDescription)")
             return
