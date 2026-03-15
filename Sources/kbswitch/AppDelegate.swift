@@ -61,7 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         keyboardMonitor.start()
 
         UpdateChecker.showPostUpdateAlertIfNeeded()
-        UpdateChecker.checkInBackground()
+        UpdateChecker.startDailyCheck()
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {

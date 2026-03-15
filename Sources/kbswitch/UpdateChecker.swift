@@ -41,8 +41,22 @@ enum UpdateChecker {
     private static var progressObservation: NSKeyValueObservation?
     private static var progressWindow: NSPanel?
 
-    static func checkInBackground() {
+    private static let lastCheckKey = "lastUpdateCheck"
+    private static var checkTimer: Timer?
+
+    static func startDailyCheck() {
         guard currentVersion != nil else { return }
+        checkIfDue()
+        checkTimer = Timer.scheduledTimer(withTimeInterval: 86400, repeats: true) { _ in
+            checkIfDue()
+        }
+    }
+
+    private static func checkIfDue() {
+        let lastCheck = UserDefaults.standard.double(forKey: lastCheckKey)
+        let now = Date().timeIntervalSince1970
+        guard now - lastCheck >= 86400 else { return }
+        UserDefaults.standard.set(now, forKey: lastCheckKey)
         fetchLatestRelease { result in
             if case .available(let release) = result {
                 DispatchQueue.main.async {
