@@ -92,18 +92,18 @@ final class KeyboardMonitor {
     }
 
     private static let mouseNames = [
-        "mouse", "trackball", "trackpad", "pointing",
+        "mouse", "trackball",
         "mx master", "mx anywhere", "mx ergo", "mx vertical",
         "deathadder", "naga", "viper", "basilisk",
-        "g pro wireless", "g502", "g903", "g604",
+        "g502", "g903", "g604",
         "dark core", "scimitar", "nightsword",
-        "rival ", "aerox", "prime ",
-        "surface precision",
+        "aerox", "surface precision",
     ]
 
     private func isMouseByName(_ device: IOHIDDevice) -> Bool {
         guard let name = property(device, kIOHIDProductKey) as? String else { return false }
         let lower = name.lowercased()
+        if lower.contains("keyboard") { return false }
         return KeyboardMonitor.mouseNames.contains(where: { lower.contains($0) })
     }
 
