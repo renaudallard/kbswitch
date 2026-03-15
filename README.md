@@ -19,7 +19,7 @@ connect or disconnect.
 
 | | Minimum |
 |---|---|
-| **macOS** | 13.0 (Ventura) |
+| **macOS** | 26.0 (Tahoe) |
 | **Architecture** | Apple Silicon (arm64) |
 
 ## Install

@@ -77,9 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 if keyboard.isBuiltIn {
                     title += " (built-in)"
                 }
-                let kbItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
-                kbItem.isEnabled = false
-                menu.addItem(kbItem)
+                menu.addItem(.sectionHeader(title: title))
 
                 let selectedLayout = mappingStore.layoutID(for: keyboard.identifier)
 
