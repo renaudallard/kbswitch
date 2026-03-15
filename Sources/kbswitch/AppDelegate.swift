@@ -81,7 +81,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     title += " (built-in)"
                 }
 
+                let kbItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+                kbItem.isEnabled = false
+                menu.addItem(kbItem)
+
                 let selectedLayout = mappingStore.layoutID(for: keyboard.identifier)
+                let currentName = sources.first(where: { $0.id == selectedLayout })?.name ?? "None"
 
                 let submenu = NSMenu()
 
@@ -101,9 +106,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                     submenu.addItem(item)
                 }
 
-                let kbItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
-                kbItem.submenu = submenu
-                menu.addItem(kbItem)
+                let layoutItem = NSMenuItem(title: currentName, action: nil, keyEquivalent: "")
+                layoutItem.submenu = submenu
+                layoutItem.indentationLevel = 1
+                menu.addItem(layoutItem)
             }
         }
 
