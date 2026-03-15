@@ -28,6 +28,9 @@ import Cocoa
 enum UpdateChecker {
     private static let repo = "renaudallard/kbswitch"
     private static let apiURL = URL(string: "https://api.github.com/repos/\(repo)/releases/latest")!
+    private static let session: URLSession = {
+        URLSession(configuration: .ephemeral)
+    }()
 
     private struct Release {
         let version: String
@@ -102,7 +105,7 @@ enum UpdateChecker {
         var request = URLRequest(url: apiURL)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
 
-        URLSession.shared.dataTask(with: request) { data, _, error in
+        session.dataTask(with: request) { data, _, error in
             if let error = error {
                 NSLog("kbswitch: update check failed: %@", error.localizedDescription)
                 completion(.error("Could not check for updates: \(error.localizedDescription)"))
@@ -200,7 +203,7 @@ enum UpdateChecker {
 
         let (panel, bar, label) = showProgressWindow()
 
-        let task = URLSession.shared.downloadTask(with: url) { tempURL, _, error in
+        let task = session.downloadTask(with: url) { tempURL, _, error in
             DispatchQueue.main.async {
                 progressObservation = nil
 
