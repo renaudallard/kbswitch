@@ -54,7 +54,17 @@ enum InputSourceManager {
         }
     }
 
+    static func currentSourceID() -> String? {
+        guard let source = TISCopyCurrentKeyboardInputSource()?.takeRetainedValue(),
+              let ptr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID) else {
+            return nil
+        }
+        return Unmanaged<CFString>.fromOpaque(ptr).takeUnretainedValue() as String
+    }
+
     static func select(sourceID: String) {
+        if currentSourceID() == sourceID { return }
+
         let conditions: [String: Any] = [
             kTISPropertyInputSourceID as String: sourceID,
         ]
