@@ -91,8 +91,25 @@ final class KeyboardMonitor {
         connectedDevices.removeAll()
     }
 
+    private static let mouseNames = [
+        "mouse", "trackball", "trackpad", "pointing",
+        "mx master", "mx anywhere", "mx ergo", "mx vertical",
+        "deathadder", "naga", "viper", "basilisk",
+        "g pro wireless", "g502", "g903", "g604",
+        "dark core", "scimitar", "nightsword",
+        "rival ", "aerox", "prime ",
+        "surface precision",
+    ]
+
+    private func isMouseByName(_ device: IOHIDDevice) -> Bool {
+        guard let name = property(device, kIOHIDProductKey) as? String else { return false }
+        let lower = name.lowercased()
+        return KeyboardMonitor.mouseNames.contains(where: { lower.contains($0) })
+    }
+
     private func deviceConnected(_ device: IOHIDDevice) {
-        guard hasEnoughKeys(device),
+        guard !isMouseByName(device),
+              hasEnoughKeys(device),
               let keyboard = extractKeyboard(from: device) else { return }
         connectedDevices.append((device: device, keyboard: keyboard))
         delegate?.keyboardConnected(keyboard)
