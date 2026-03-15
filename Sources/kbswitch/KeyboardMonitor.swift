@@ -27,8 +27,7 @@ import Foundation
 import IOKit
 import IOKit.hid
 
-struct ConnectedKeyboard: Identifiable {
-    let id = UUID()
+struct ConnectedKeyboard {
     let identifier: KeyboardIdentifier
     let name: String
     let isBuiltIn: Bool

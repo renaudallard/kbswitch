@@ -24,14 +24,21 @@
  */
 
 import Cocoa
-import SwiftUI
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+private final class LayoutSelection {
+    let keyboard: KeyboardIdentifier
+    let layoutID: String?
+
+    init(keyboard: KeyboardIdentifier, layoutID: String?) {
+        self.keyboard = keyboard
+        self.layoutID = layoutID
+    }
+}
+
+final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
-    private var popover: NSPopover!
     private let keyboardMonitor = KeyboardMonitor()
     private let mappingStore = MappingStore()
-    private let viewModel = KeyboardViewModel()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -42,32 +49,82 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 systemSymbolName: "keyboard",
                 accessibilityDescription: "kbswitch"
             )
-            button.action = #selector(togglePopover)
-            button.target = self
         }
 
-        popover = NSPopover()
-        popover.contentSize = NSSize(width: 320, height: 400)
-        popover.behavior = .transient
-        popover.contentViewController = NSHostingController(
-            rootView: MenuView(viewModel: viewModel)
-        )
-
-        viewModel.mappingStore = mappingStore
-        viewModel.refreshSources()
+        let menu = NSMenu()
+        menu.delegate = self
+        statusItem.menu = menu
 
         keyboardMonitor.delegate = self
         keyboardMonitor.start()
     }
 
-    @objc private func togglePopover() {
-        guard let button = statusItem.button else { return }
-        if popover.isShown {
-            popover.performClose(nil)
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        menu.removeAllItems()
+
+        let sources = InputSourceManager.availableSources()
+        let keyboards = keyboardMonitor.keyboards
+
+        if keyboards.isEmpty {
+            let item = NSMenuItem(title: "No keyboards detected", action: nil, keyEquivalent: "")
+            item.isEnabled = false
+            menu.addItem(item)
         } else {
-            viewModel.refreshSources()
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            for keyboard in keyboards {
+                var title = keyboard.name
+                if keyboard.isBuiltIn {
+                    title += " (built-in)"
+                }
+                let kbItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+                kbItem.isEnabled = false
+                menu.addItem(kbItem)
+
+                let selectedLayout = mappingStore.layoutID(for: keyboard.identifier)
+
+                let noneItem = NSMenuItem(title: "None", action: #selector(selectLayout(_:)), keyEquivalent: "")
+                noneItem.target = self
+                noneItem.representedObject = LayoutSelection(keyboard: keyboard.identifier, layoutID: nil)
+                noneItem.state = selectedLayout == nil ? .on : .off
+                noneItem.indentationLevel = 1
+                menu.addItem(noneItem)
+
+                for source in sources {
+                    let item = NSMenuItem(title: source.name, action: #selector(selectLayout(_:)), keyEquivalent: "")
+                    item.target = self
+                    item.representedObject = LayoutSelection(keyboard: keyboard.identifier, layoutID: source.id)
+                    item.state = selectedLayout == source.id ? .on : .off
+                    item.indentationLevel = 1
+                    menu.addItem(item)
+                }
+
+                menu.addItem(NSMenuItem.separator())
+            }
         }
+
+        if keyboards.isEmpty {
+            menu.addItem(NSMenuItem.separator())
+        }
+
+        let launchItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+        launchItem.target = self
+        launchItem.state = LaunchAtLogin.isEnabled ? .on : .off
+        menu.addItem(launchItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+    }
+
+    @objc private func selectLayout(_ sender: NSMenuItem) {
+        guard let selection = sender.representedObject as? LayoutSelection else { return }
+        mappingStore.setLayoutID(selection.layoutID, for: selection.keyboard)
+        if let layoutID = selection.layoutID {
+            InputSourceManager.select(sourceID: layoutID)
+        }
+    }
+
+    @objc private func toggleLaunchAtLogin() {
+        LaunchAtLogin.toggle()
     }
 
     private func switchLayoutForCurrentState() {
@@ -82,15 +139,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate: KeyboardMonitorDelegate {
     func keyboardConnected(_ keyboard: ConnectedKeyboard) {
-        viewModel.update(keyboards: keyboardMonitor.keyboards)
-
         if let layout = mappingStore.layoutID(for: keyboard.identifier) {
             InputSourceManager.select(sourceID: layout)
         }
     }
 
     func keyboardDisconnected(_ keyboard: ConnectedKeyboard) {
-        viewModel.update(keyboards: keyboardMonitor.keyboards)
         switchLayoutForCurrentState()
     }
 }

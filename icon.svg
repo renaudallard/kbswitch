@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Background rounded square -->
+  <rect x="0" y="0" width="1024" height="1024" rx="228" ry="228" fill="#1c1c1e"/>
+
+  <!-- Keyboard body -->
+  <rect x="112" y="340" width="800" height="400" rx="36" ry="36" fill="#58585a" stroke="#8e8e93" stroke-width="5"/>
+
+  <!-- Keyboard inner surface -->
+  <rect x="140" y="368" width="744" height="344" rx="20" ry="20" fill="#2c2c2e"/>
+
+  <!-- Row 1 -->
+  <rect x="164" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="228" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="292" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="356" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="420" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="484" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="548" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="612" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="676" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="740" y="386" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="804" y="386" width="56" height="38" rx="6" fill="#48484a"/>
+
+  <!-- Row 2 -->
+  <rect x="164" y="436" width="72" height="38" rx="6" fill="#48484a"/>
+  <rect x="248" y="436" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="312" y="436" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="376" y="436" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="440" y="436" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="504" y="436" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="568" y="436" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="632" y="436" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="696" y="436" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="760" y="436" width="100" height="38" rx="6" fill="#48484a"/>
+
+  <!-- Row 3 -->
+  <rect x="164" y="486" width="92" height="38" rx="6" fill="#48484a"/>
+  <rect x="268" y="486" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="332" y="486" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="396" y="486" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="460" y="486" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="524" y="486" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="588" y="486" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="652" y="486" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="716" y="486" width="144" height="38" rx="6" fill="#48484a"/>
+
+  <!-- Row 4 -->
+  <rect x="164" y="536" width="112" height="38" rx="6" fill="#48484a"/>
+  <rect x="288" y="536" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="352" y="536" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="416" y="536" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="480" y="536" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="544" y="536" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="608" y="536" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="672" y="536" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="736" y="536" width="124" height="38" rx="6" fill="#48484a"/>
+
+  <!-- Row 5 - space bar row -->
+  <rect x="164" y="586" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="228" y="586" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="292" y="586" width="72" height="38" rx="6" fill="#48484a"/>
+  <rect x="376" y="586" width="288" height="38" rx="6" fill="#48484a"/>
+  <rect x="676" y="586" width="72" height="38" rx="6" fill="#48484a"/>
+  <rect x="760" y="586" width="44" height="38" rx="6" fill="#48484a"/>
+  <rect x="816" y="586" width="44" height="38" rx="6" fill="#48484a"/>
+
+  <!-- Row 6 - fn/arrow row -->
+  <rect x="164" y="636" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="228" y="636" width="52" height="38" rx="6" fill="#48484a"/>
+  <rect x="292" y="636" width="72" height="38" rx="6" fill="#48484a"/>
+  <rect x="376" y="636" width="288" height="38" rx="6" fill="#48484a"/>
+  <rect x="676" y="636" width="72" height="38" rx="6" fill="#48484a"/>
+  <rect x="760" y="636" width="44" height="38" rx="6" fill="#48484a"/>
+  <rect x="816" y="636" width="44" height="38" rx="6" fill="#48484a"/>
+
+  <!-- Big S striking through the keyboard, centered -->
+  <text x="512" y="560" font-family="Helvetica, Arial, sans-serif" font-weight="bold"
+        font-size="820" fill="#0a84ff" text-anchor="middle" dominant-baseline="central"
+        font-style="italic">S</text>
+</svg>

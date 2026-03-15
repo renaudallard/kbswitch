@@ -52,7 +52,7 @@ swift build -c release --arch arm64
 
 1. **kbswitch** runs in the menu bar (keyboard icon, no dock icon).
 2. Click the icon to see connected keyboards.
-3. For each keyboard, pick the input layout from the dropdown.
+3. For each keyboard, pick the input layout from the native menu.
 4. Mappings are saved automatically. When a mapped keyboard connects, its
    layout activates. When it disconnects, the remaining keyboard's layout
    takes over.
@@ -72,16 +72,14 @@ Toggle **Launch at Login** in the menu to start kbswitch automatically.
 
 ```
 Sources/kbswitch/
-    main.swift              Application entry point
-    AppDelegate.swift       Status bar item and popover setup
-    KeyboardMonitor.swift   IOKit HID keyboard detection
+    main.swift               Application entry point
+    AppDelegate.swift        Status bar menu and keyboard events
+    KeyboardMonitor.swift    IOKit HID keyboard detection
     InputSourceManager.swift Carbon TIS input source control
-    KeyboardViewModel.swift SwiftUI view model
     KeyboardIdentifier.swift Vendor/product/serial identifier
-    MappingStore.swift      UserDefaults persistence
-    MenuView.swift          SwiftUI popover UI
-    LaunchAtLogin.swift     SMAppService login item toggle
-    Info.plist              App bundle metadata
+    MappingStore.swift       UserDefaults persistence
+    LaunchAtLogin.swift      SMAppService login item toggle
+    Info.plist               App bundle metadata
 ```
 
 ## License
