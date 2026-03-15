@@ -92,7 +92,8 @@ final class KeyboardMonitor {
     }
 
     private func deviceConnected(_ device: IOHIDDevice) {
-        guard let keyboard = extractKeyboard(from: device) else { return }
+        guard hasEnoughKeys(device),
+              let keyboard = extractKeyboard(from: device) else { return }
         connectedDevices.append((device: device, keyboard: keyboard))
         delegate?.keyboardConnected(keyboard)
     }
@@ -125,6 +126,18 @@ final class KeyboardMonitor {
             name: name,
             isBuiltIn: isBuiltIn
         )
+    }
+
+    private func hasEnoughKeys(_ device: IOHIDDevice) -> Bool {
+        let matching: [String: Any] = [
+            kIOHIDElementUsagePageKey as String: kHIDPage_KeyboardOrKeypad,
+        ]
+        guard let elements = IOHIDDeviceCopyMatchingElements(
+            device, matching as CFDictionary, IOOptionBits(kIOHIDOptionsTypeNone)
+        ) else {
+            return false
+        }
+        return CFArrayGetCount(elements) >= 20
     }
 
     private func property(_ device: IOHIDDevice, _ key: String) -> Any? {
