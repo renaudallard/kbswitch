@@ -53,12 +53,13 @@ Open it and drag **kbswitch.app** to `/Applications`.
 ## Usage
 
 1. kbswitch appears in the menu bar (keyboard icon).
-2. Click it to see connected keyboards.
-3. Hover a keyboard to open its submenu and pick the input layout.
+2. Click it to see connected keyboards with their current layout below.
+3. Click the layout to open a dropdown and pick a different input source.
 4. Mappings are saved automatically. When a mapped keyboard connects, its
    layout activates. When it disconnects, the remaining keyboard's layout
    takes over.
 
+Use **Keyboard Settings...** to open System Settings and add or change input sources.
 Use **Launch at Login** to start kbswitch automatically.
 Use **Check for Updates...** to check for and install new versions.
 
@@ -74,7 +75,7 @@ swift build -c release --arch arm64   # binary only
 
 | Component | Details |
 |---|---|
-| **Keyboard detection** | IOKit HID Manager monitors connect/disconnect events in real time. Each keyboard is identified by vendor ID, product ID, and serial number. Mice and non-keyboard HID devices are filtered by key element count. |
+| **Keyboard detection** | IOKit HID Manager monitors connect/disconnect events in real time. Each keyboard is identified by vendor ID, product ID, and serial number. Mice are filtered by product name and key element count. |
 | **Layout switching** | Carbon Text Input Source Services (`TISSelectInputSource`) changes the active input source. Redundant switches are skipped to avoid CPU overhead. |
 | **Configuration** | Keyboard-to-layout mappings are stored in UserDefaults. |
 | **Auto-update** | Checks GitHub releases on launch. Downloads the DMG, mounts it, replaces the app, strips quarantine, and relaunches. Shows a progress bar during download and a confirmation alert on completion. |
