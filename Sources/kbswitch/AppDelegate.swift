@@ -106,9 +106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
         }
 
-        if keyboards.isEmpty {
-            menu.addItem(NSMenuItem.separator())
-        }
+        menu.addItem(NSMenuItem.separator())
 
         let launchItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
         launchItem.target = self

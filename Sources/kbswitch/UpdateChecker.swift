@@ -43,10 +43,11 @@ enum UpdateChecker {
 
     static func checkInBackground() {
         guard currentVersion != nil else { return }
-        fetchLatestRelease { release in
-            guard let release = release else { return }
-            DispatchQueue.main.async {
-                showUpdateAlert(release: release)
+        fetchLatestRelease { result in
+            if case .available(let release) = result {
+                DispatchQueue.main.async {
+                    showUpdateAlert(release: release)
+                }
             }
         }
     }
@@ -56,20 +57,29 @@ enum UpdateChecker {
             showErrorAlert("Could not determine current version.")
             return
         }
-        fetchLatestRelease { release in
+        fetchLatestRelease { result in
             DispatchQueue.main.async {
-                if let release = release {
+                switch result {
+                case .available(let release):
                     showUpdateAlert(release: release)
-                } else {
+                case .upToDate:
                     showUpToDateAlert()
+                case .error(let message):
+                    showErrorAlert(message)
                 }
             }
         }
     }
 
-    private static func fetchLatestRelease(completion: @escaping (Release?) -> Void) {
+    private enum FetchResult {
+        case available(Release)
+        case upToDate
+        case error(String)
+    }
+
+    private static func fetchLatestRelease(completion: @escaping (FetchResult) -> Void) {
         guard let current = currentVersion else {
-            completion(nil)
+            completion(.error("Could not determine current version."))
             return
         }
 
@@ -77,21 +87,28 @@ enum UpdateChecker {
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
 
         URLSession.shared.dataTask(with: request) { data, _, error in
+            if let error = error {
+                NSLog("kbswitch: update check failed: %@", error.localizedDescription)
+                completion(.error("Could not check for updates: \(error.localizedDescription)"))
+                return
+            }
+
             guard let data = data,
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let tagName = json["tag_name"] as? String else {
-                if let error = error {
-                    NSLog("kbswitch: update check failed: %@", error.localizedDescription)
-                }
-                completion(nil)
+                completion(.error("Could not parse update information."))
                 return
             }
 
             let remote = tagName.hasPrefix("v") ? String(tagName.dropFirst()) : tagName
 
-            guard isNewer(remote, than: current),
-                  let assets = json["assets"] as? [[String: Any]] else {
-                completion(nil)
+            guard isNewer(remote, than: current) else {
+                completion(.upToDate)
+                return
+            }
+
+            guard let assets = json["assets"] as? [[String: Any]] else {
+                completion(.error("No download available for this release."))
                 return
             }
 
@@ -99,12 +116,12 @@ enum UpdateChecker {
                 if let name = asset["name"] as? String,
                    name.hasSuffix(".dmg"),
                    let url = asset["browser_download_url"] as? String {
-                    completion(Release(version: remote, dmgURL: url))
+                    completion(.available(Release(version: remote, dmgURL: url)))
                     return
                 }
             }
 
-            completion(nil)
+            completion(.error("No DMG found in the latest release."))
         }.resume()
     }
 
