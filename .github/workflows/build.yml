@@ -11,13 +11,13 @@ jobs:
   build:
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Build app bundle
         run: bash build-app.sh
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: kbswitch.app
           path: .build/kbswitch.app
@@ -29,7 +29,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Build app bundle
         run: bash build-app.sh
@@ -43,6 +43,6 @@ jobs:
             -ov -format UDZO .build/kbswitch.dmg
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
           files: .build/kbswitch.dmg
