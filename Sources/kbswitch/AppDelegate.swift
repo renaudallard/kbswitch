@@ -45,10 +45,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem.button {
-            button.image = NSImage(
-                systemSymbolName: "keyboard",
-                accessibilityDescription: "kbswitch"
-            )
+            let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
+            if let image = NSImage(systemSymbolName: "keyboard", accessibilityDescription: "kbswitch")?
+                .withSymbolConfiguration(config) {
+                image.isTemplate = true
+                button.image = image
+            }
         }
 
         let menu = NSMenu()
