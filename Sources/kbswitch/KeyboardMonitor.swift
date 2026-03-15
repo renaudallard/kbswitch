@@ -130,14 +130,15 @@ final class KeyboardMonitor {
 
     private func hasEnoughKeys(_ device: IOHIDDevice) -> Bool {
         let matching: [String: Any] = [
-            kIOHIDElementUsagePageKey as String: kHIDPage_KeyboardOrKeypad,
+            kIOHIDElementUsagePageKey as String: Int(kHIDPage_KeyboardOrKeypad),
         ]
         guard let elements = IOHIDDeviceCopyMatchingElements(
             device, matching as CFDictionary, IOOptionBits(kIOHIDOptionsTypeNone)
         ) else {
-            return false
+            return true
         }
-        return CFArrayGetCount(elements) >= 20
+        let count = CFArrayGetCount(elements)
+        return count == 0 || count >= 20
     }
 
     private func property(_ device: IOHIDDevice, _ key: String) -> Any? {
