@@ -27,7 +27,7 @@ import PackageDescription
 
 let package = Package(
     name: "kbswitch",
-    platforms: [.macOS("26.0")],
+    platforms: [.macOS(.v13)],
     targets: [
         .executableTarget(
             name: "kbswitch",

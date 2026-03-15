@@ -77,7 +77,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 if keyboard.isBuiltIn {
                     title += " (built-in)"
                 }
-                menu.addItem(.sectionHeader(title: title))
+                if #available(macOS 14, *) {
+                    menu.addItem(.sectionHeader(title: title))
+                } else {
+                    let kbItem = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+                    kbItem.isEnabled = false
+                    menu.addItem(kbItem)
+                }
 
                 let selectedLayout = mappingStore.layoutID(for: keyboard.identifier)
 
